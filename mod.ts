@@ -13,6 +13,7 @@ import {
 import { patchTemplate as format } from "./format.ts";
 import { listPinnedPages } from "./list.ts";
 import type { Scrapbox, Socket } from "./deps.ts";
+import { deleteNoEditDiary } from "./diary.ts";
 declare const scrapbox: Scrapbox;
 
 export interface DiaryInit {
@@ -78,6 +79,8 @@ export const pinDiary = async (
     for await (const { title } of listPinnedPages(project)) {
       if (!isOldDiary(title, date)) continue;
       await unpin(project, title, { socket });
+      // OldDiaryかつ編集されていないページであれば削除する
+      deleteNoEditDiary(project, title, socket);
     }
 
     // 今日の日付ページをピン留めする
